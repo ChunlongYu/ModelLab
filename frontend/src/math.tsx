@@ -55,6 +55,11 @@ export function formula(e: Expr, model?: Record<string, any>): string {
     }
     case "div":
       return `\\frac{${f(e.numerator)}}{${f(e.denominator)}}`;
+    case "abs":
+      return `\\left|${f(e.arg)}\\right|`;
+    case "max":
+    case "min":
+      return `\\${e.kind}\\left(${(e.args || []).map(f).join(",\\,")}\\right)`;
     case "sum": {
       const setIdx = e.set_index
         ? `_{${escape(e.set_index.kind === "index" ? e.set_index.name : String(e.set_index.value))}}`
@@ -109,6 +114,11 @@ export function notation(e: Expr): string {
       return `${wrapTextIfAdd(e.left, notation(e.left))} * ${wrapTextIfAdd(e.right, notation(e.right))}`;
     case "div":
       return `${wrapTextIfAdd(e.numerator, notation(e.numerator))} / ${wrapTextIfAdd(e.denominator, notation(e.denominator))}`;
+    case "abs":
+      return `abs(${notation(e.arg)})`;
+    case "max":
+    case "min":
+      return `${e.kind}(${(e.args || []).map(notation).join(", ")})`;
     case "sum": {
       const setPart = e.set_index
         ? `${e.set}[${e.set_index.kind === "index" ? e.set_index.name : JSON.stringify(e.set_index.value)}]`

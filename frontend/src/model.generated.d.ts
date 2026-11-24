@@ -8,9 +8,15 @@
 export type SchemaVersion = "1.0";
 export type Id = string;
 export type Members = (number | string)[];
+export type IndexSet = string | null;
+export type Index = number | string;
+export type Members1 = (number | string)[];
+export type IndexedMembers = IndexedSetEntry[];
+export type Description = string;
 export type Sets = SetDecl[];
 export type Id1 = string;
 export type Symbol = string;
+export type Description1 = string;
 export type Sets1 = string[];
 export type Value = number | null;
 export type Indices = (number | string)[];
@@ -25,6 +31,7 @@ export type SourceRefs = Source[];
 export type Parameters = Parameter[];
 export type Id2 = string;
 export type Symbol1 = string;
+export type Description2 = string;
 export type Sets2 = string[];
 export type Domain = "continuous" | "integer" | "binary";
 export type Lower = number | null;
@@ -33,8 +40,9 @@ export type RangeSource = string;
 export type SourceRefs1 = Source[];
 export type Variables = Variable[];
 export type Id3 = string;
+export type Description3 = string;
 export type Sense = "min" | "max";
-export type Expr = Number | Param | Var | Add | Neg | Mul | Div | Sum;
+export type Expr = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
 export type Kind = "number";
 export type Value2 = number;
 export type Kind1 = "param";
@@ -43,33 +51,57 @@ export type Kind2 = "index";
 export type Name = string;
 export type Kind3 = "literal";
 export type Value3 = number | string;
-export type Indices1 = (Index | LiteralIndex)[];
+export type Indices1 = (Index1 | LiteralIndex)[];
 export type Kind4 = "var";
 export type Id5 = string;
-export type Indices2 = (Index | LiteralIndex)[];
+export type Indices2 = (Index1 | LiteralIndex)[];
 export type Kind5 = "add";
 export type Kind6 = "neg";
-export type Arg = Number | Param | Var | Add | Neg | Mul | Div | Sum;
+export type Arg = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
 export type Kind7 = "mul";
-export type Left = Number | Param | Var | Add | Neg | Mul | Div | Sum;
+export type Left = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
 export type Kind8 = "div";
-export type Numerator = Number | Param | Var | Add | Neg | Mul | Div | Sum;
-export type Kind9 = "sum";
-export type Index1 = string;
+export type Numerator = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
+export type Kind9 = "abs";
+export type Arg1 = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
+export type Kind10 = "max";
+/**
+ * @minItems 2
+ */
+export type Args1 = [
+  Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum,
+  Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum,
+  ...(Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum)[]
+];
+export type Kind11 = "min";
+/**
+ * @minItems 2
+ */
+export type Args2 = [
+  Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum,
+  Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum,
+  ...(Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum)[]
+];
+export type Kind12 = "sum";
+export type Index2 = string;
 export type Set = string;
-export type Body = Number | Param | Var | Add | Neg | Mul | Div | Sum;
-export type Denominator = Number | Param | Var | Add | Neg | Mul | Div | Sum;
-export type Right = Number | Param | Var | Add | Neg | Mul | Div | Sum;
-export type Args = (Number | Param | Var | Add | Neg | Mul | Div | Sum)[];
+export type SetIndex = (Index1 | LiteralIndex) | null;
+export type Body = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
+export type Denominator = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
+export type Right = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
+export type Args = (Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum)[];
 export type SourceRefs2 = Source[];
 export type TranscriptLatex = string;
 export type Id6 = string;
-export type Index2 = string;
+export type Description4 = string;
+export type Index3 = string;
 export type Set1 = string;
+export type SetIndex1 = (Index1 | LiteralIndex) | null;
 export type ForEach = Quantifier[];
-export type Lhs = Number | Param | Var | Add | Neg | Mul | Div | Sum;
+export type Where = string;
+export type Lhs = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
 export type Sense1 = "le" | "eq" | "ge";
-export type Rhs = Number | Param | Var | Add | Neg | Mul | Div | Sum;
+export type Rhs = Number | Param | Var | Add | Neg | Mul | Div | Abs | Max | Min | Sum;
 export type SourceRefs3 = Source[];
 export type TranscriptLatex1 = string;
 export type Constraints = Constraint[];
@@ -93,11 +125,19 @@ export interface ModelDoc {
 }
 export interface SetDecl {
   id: Id;
-  members: Members;
+  members?: Members;
+  index_set?: IndexSet;
+  indexed_members?: IndexedMembers;
+  description?: Description;
+}
+export interface IndexedSetEntry {
+  index: Index;
+  members: Members1;
 }
 export interface Parameter {
   id: Id1;
   symbol?: Symbol;
+  description?: Description1;
   sets?: Sets1;
   value?: Value;
   entries?: Entries;
@@ -117,6 +157,7 @@ export interface Source {
 export interface Variable {
   id: Id2;
   symbol?: Symbol1;
+  description?: Description2;
   sets?: Sets2;
   domain: Domain;
   lower: Lower;
@@ -126,6 +167,7 @@ export interface Variable {
 }
 export interface Objective {
   id?: Id3;
+  description?: Description3;
   sense: Sense;
   expr: Expr;
   source_refs?: SourceRefs2;
@@ -140,7 +182,7 @@ export interface Param {
   id: Id4;
   indices?: Indices1;
 }
-export interface Index {
+export interface Index1 {
   kind: Kind2;
   name: Name;
 }
@@ -171,15 +213,30 @@ export interface Div {
   numerator: Numerator;
   denominator: Denominator;
 }
-export interface Sum {
+export interface Abs {
   kind: Kind9;
-  index: Index1;
+  arg: Arg1;
+}
+export interface Max {
+  kind: Kind10;
+  args: Args1;
+}
+export interface Min {
+  kind: Kind11;
+  args: Args2;
+}
+export interface Sum {
+  kind: Kind12;
+  index: Index2;
   set: Set;
+  set_index?: SetIndex;
   body: Body;
 }
 export interface Constraint {
   id: Id6;
+  description?: Description4;
   for_each?: ForEach;
+  where?: Where;
   lhs: Lhs;
   sense: Sense1;
   rhs: Rhs;
@@ -187,8 +244,9 @@ export interface Constraint {
   transcript_latex?: TranscriptLatex1;
 }
 export interface Quantifier {
-  index: Index2;
+  index: Index3;
   set: Set1;
+  set_index?: SetIndex1;
 }
 export interface Unresolved {
   id: Id7;

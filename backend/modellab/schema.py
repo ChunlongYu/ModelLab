@@ -70,6 +70,21 @@ class Div(Strict):
     denominator: "Expr"
 
 
+class Abs(Strict):
+    kind: Literal["abs"]
+    arg: "Expr"
+
+
+class Max(Strict):
+    kind: Literal["max"]
+    args: list["Expr"] = Field(min_length=2)
+
+
+class Min(Strict):
+    kind: Literal["min"]
+    args: list["Expr"] = Field(min_length=2)
+
+
 class Sum(Strict):
     kind: Literal["sum"]
     index: Id
@@ -79,7 +94,7 @@ class Sum(Strict):
 
 
 Expr = Annotated[
-    Union[Number, Param, Var, Add, Neg, Mul, Div, Sum], Field(discriminator="kind")
+    Union[Number, Param, Var, Add, Neg, Mul, Div, Abs, Max, Min, Sum], Field(discriminator="kind")
 ]
 
 
@@ -171,5 +186,5 @@ class ModelDoc(Strict):
     transcript: str = ""
 
 
-for cls in (Add, Neg, Mul, Div, Sum, Constraint, Objective, ModelDoc):
+for cls in (Add, Neg, Mul, Div, Abs, Max, Min, Sum, Constraint, Objective, ModelDoc):
     cls.model_rebuild()

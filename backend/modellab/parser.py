@@ -69,6 +69,21 @@ def parse_expression(text, model):
         if (
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)
+            and node.func.id in ("abs", "max", "min")
+            and not node.keywords
+            and not any(isinstance(a, ast.Starred) for a in node.args)
+        ):
+            name = node.func.id
+            if name == "abs" and len(node.args) == 1:
+                return dict(kind="abs", arg=child(node.args[0]))
+            if name != "abs" and len(node.args) >= 2:
+                return dict(kind=name, args=[child(a) for a in node.args])
+            raise ModelError(
+                "PARSE_ERROR", "abs 需要 1 个参数；max/min 至少需要 2 个参数"
+            )
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
             and node.func.id == "sum"
             and len(node.args) == 3
             and not node.keywords
@@ -105,7 +120,7 @@ def parse_expression(text, model):
                 )
         raise ModelError(
             "PARSE_ERROR",
-            "仅支持数值、已声明符号、加减乘除与 sum(i, I, 表达式)；不执行代码或任意 LaTeX",
+            "仅支持数值、已声明符号、加减乘除、abs/max/min 与 sum(i, I, 表达式)；不执行代码或任意 LaTeX",
         )
 
     return visit(tree.body)

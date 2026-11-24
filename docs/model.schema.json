@@ -1,5 +1,75 @@
 {
   "$defs": {
+    "Abs": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "abs",
+          "title": "Kind",
+          "type": "string"
+        },
+        "arg": {
+          "discriminator": {
+            "mapping": {
+              "abs": "#/$defs/Abs",
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Arg"
+        }
+      },
+      "required": [
+        "kind",
+        "arg"
+      ],
+      "title": "Abs",
+      "type": "object"
+    },
     "Add": {
       "additionalProperties": false,
       "properties": {
@@ -12,8 +82,11 @@
           "items": {
             "discriminator": {
               "mapping": {
+                "abs": "#/$defs/Abs",
                 "add": "#/$defs/Add",
                 "div": "#/$defs/Div",
+                "max": "#/$defs/Max",
+                "min": "#/$defs/Min",
                 "mul": "#/$defs/Mul",
                 "neg": "#/$defs/Neg",
                 "number": "#/$defs/Number",
@@ -46,6 +119,15 @@
                 "$ref": "#/$defs/Div"
               },
               {
+                "$ref": "#/$defs/Abs"
+              },
+              {
+                "$ref": "#/$defs/Max"
+              },
+              {
+                "$ref": "#/$defs/Min"
+              },
+              {
                 "$ref": "#/$defs/Sum"
               }
             ]
@@ -69,6 +151,11 @@
           "title": "Id",
           "type": "string"
         },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
         "for_each": {
           "default": [],
           "items": {
@@ -77,11 +164,19 @@
           "title": "For Each",
           "type": "array"
         },
+        "where": {
+          "default": "",
+          "title": "Where",
+          "type": "string"
+        },
         "lhs": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -112,6 +207,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -131,8 +235,11 @@
         "rhs": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -163,6 +270,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -204,8 +320,11 @@
         "numerator": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -236,6 +355,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -246,8 +374,11 @@
         "denominator": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -278,6 +409,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -344,6 +484,42 @@
       "title": "Index",
       "type": "object"
     },
+    "IndexedSetEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Index"
+        },
+        "members": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Members",
+          "type": "array"
+        }
+      },
+      "required": [
+        "index",
+        "members"
+      ],
+      "title": "IndexedSetEntry",
+      "type": "object"
+    },
     "LiteralIndex": {
       "additionalProperties": false,
       "properties": {
@@ -371,6 +547,154 @@
       "title": "LiteralIndex",
       "type": "object"
     },
+    "Max": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "max",
+          "title": "Kind",
+          "type": "string"
+        },
+        "args": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "abs": "#/$defs/Abs",
+                "add": "#/$defs/Add",
+                "div": "#/$defs/Div",
+                "max": "#/$defs/Max",
+                "min": "#/$defs/Min",
+                "mul": "#/$defs/Mul",
+                "neg": "#/$defs/Neg",
+                "number": "#/$defs/Number",
+                "param": "#/$defs/Param",
+                "sum": "#/$defs/Sum",
+                "var": "#/$defs/Var"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Number"
+              },
+              {
+                "$ref": "#/$defs/Param"
+              },
+              {
+                "$ref": "#/$defs/Var"
+              },
+              {
+                "$ref": "#/$defs/Add"
+              },
+              {
+                "$ref": "#/$defs/Neg"
+              },
+              {
+                "$ref": "#/$defs/Mul"
+              },
+              {
+                "$ref": "#/$defs/Div"
+              },
+              {
+                "$ref": "#/$defs/Abs"
+              },
+              {
+                "$ref": "#/$defs/Max"
+              },
+              {
+                "$ref": "#/$defs/Min"
+              },
+              {
+                "$ref": "#/$defs/Sum"
+              }
+            ]
+          },
+          "minItems": 2,
+          "title": "Args",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "args"
+      ],
+      "title": "Max",
+      "type": "object"
+    },
+    "Min": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "min",
+          "title": "Kind",
+          "type": "string"
+        },
+        "args": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "abs": "#/$defs/Abs",
+                "add": "#/$defs/Add",
+                "div": "#/$defs/Div",
+                "max": "#/$defs/Max",
+                "min": "#/$defs/Min",
+                "mul": "#/$defs/Mul",
+                "neg": "#/$defs/Neg",
+                "number": "#/$defs/Number",
+                "param": "#/$defs/Param",
+                "sum": "#/$defs/Sum",
+                "var": "#/$defs/Var"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Number"
+              },
+              {
+                "$ref": "#/$defs/Param"
+              },
+              {
+                "$ref": "#/$defs/Var"
+              },
+              {
+                "$ref": "#/$defs/Add"
+              },
+              {
+                "$ref": "#/$defs/Neg"
+              },
+              {
+                "$ref": "#/$defs/Mul"
+              },
+              {
+                "$ref": "#/$defs/Div"
+              },
+              {
+                "$ref": "#/$defs/Abs"
+              },
+              {
+                "$ref": "#/$defs/Max"
+              },
+              {
+                "$ref": "#/$defs/Min"
+              },
+              {
+                "$ref": "#/$defs/Sum"
+              }
+            ]
+          },
+          "minItems": 2,
+          "title": "Args",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "args"
+      ],
+      "title": "Min",
+      "type": "object"
+    },
     "Mul": {
       "additionalProperties": false,
       "properties": {
@@ -382,8 +706,11 @@
         "left": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -414,6 +741,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -424,8 +760,11 @@
         "right": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -456,6 +795,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -483,8 +831,11 @@
         "arg": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -515,6 +866,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -559,6 +919,11 @@
           "title": "Id",
           "type": "string"
         },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
         "sense": {
           "enum": [
             "min",
@@ -570,8 +935,11 @@
         "expr": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -602,6 +970,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -686,6 +1063,11 @@
           "title": "Symbol",
           "type": "string"
         },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
         "sets": {
           "default": [],
           "items": {
@@ -767,6 +1149,32 @@
           "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
           "title": "Set",
           "type": "string"
+        },
+        "set_index": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "index": "#/$defs/Index",
+                  "literal": "#/$defs/LiteralIndex"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/Index"
+                },
+                {
+                  "$ref": "#/$defs/LiteralIndex"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Set Index"
         }
       },
       "required": [
@@ -785,6 +1193,7 @@
           "type": "string"
         },
         "members": {
+          "default": [],
           "items": {
             "anyOf": [
               {
@@ -797,11 +1206,36 @@
           },
           "title": "Members",
           "type": "array"
+        },
+        "index_set": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Index Set"
+        },
+        "indexed_members": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/IndexedSetEntry"
+          },
+          "title": "Indexed Members",
+          "type": "array"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
         }
       },
       "required": [
-        "id",
-        "members"
+        "id"
       ],
       "title": "SetDecl",
       "type": "object"
@@ -871,11 +1305,40 @@
           "title": "Set",
           "type": "string"
         },
+        "set_index": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "index": "#/$defs/Index",
+                  "literal": "#/$defs/LiteralIndex"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/Index"
+                },
+                {
+                  "$ref": "#/$defs/LiteralIndex"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Set Index"
+        },
         "body": {
           "discriminator": {
             "mapping": {
+              "abs": "#/$defs/Abs",
               "add": "#/$defs/Add",
               "div": "#/$defs/Div",
+              "max": "#/$defs/Max",
+              "min": "#/$defs/Min",
               "mul": "#/$defs/Mul",
               "neg": "#/$defs/Neg",
               "number": "#/$defs/Number",
@@ -906,6 +1369,15 @@
             },
             {
               "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Abs"
+            },
+            {
+              "$ref": "#/$defs/Max"
+            },
+            {
+              "$ref": "#/$defs/Min"
             },
             {
               "$ref": "#/$defs/Sum"
@@ -1011,6 +1483,11 @@
         "symbol": {
           "default": "",
           "title": "Symbol",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
           "type": "string"
         },
         "sets": {
