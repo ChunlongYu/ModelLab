@@ -248,6 +248,11 @@ def compile_model(raw, data=None, revision_id="cli", limits=None):
             lookup[(source, key(indices))] = vid
     operations = 0
     ast_nodes = 0
+    has_var = {}
+    rows = []
+    nnz = 0
+    cur_indices = []
+    aux_count = 0
 
     def check(e, scope, depth=0):
         nonlocal ast_nodes
@@ -257,8 +262,8 @@ def compile_model(raw, data=None, revision_id="cli", limits=None):
         kind = e["kind"]
         if kind == "number":
             number(e["value"])
-            return False
-        if kind in ("var", "param"):
+            flag = False
+        elif kind in ("var", "param"):
             decls = vdecl if kind == "var" else declarations
             if e["id"] not in decls:
                 fail("UNKNOWN_SYMBOL", "未知符号：" + e["id"])
@@ -273,25 +278,28 @@ def compile_model(raw, data=None, revision_id="cli", limits=None):
                         fail("INDEX_SHAPE", "索引集合不匹配")
                 elif key([ix["value"]]) not in {key([v]) for v in sets[sid]}:
                     fail("INDEX_MEMBER", "索引不在声明集合中")
-            return kind == "var"
-        if kind == "sum":
+            flag = kind == "var"
+        elif kind == "sum":
             validate_set_ref(e["set"], e.get("set_index"), scope)
             if e["index"] in scope:
                 fail("INDEX_SCOPE", "禁止索引遮蔽，请使用不同索引")
-            return check(e["body"], {**scope, e["index"]: e["set"]}, depth + 1)
-        children = (
-            e["args"]
-            if kind == "add"
-            else [e["arg"]]
-            if kind == "neg"
-            else [e["left"], e["right"]]
-            if kind == "mul"
-            else [e["numerator"], e["denominator"]]
-        )
-        flags = [check(c, scope, depth + 1) for c in children]
-        if kind == "mul" and all(flags) or kind == "div" and flags[1]:
-            fail("UNSUPPORTED_NONLINEAR", "不支持决策变量相乘或作分母")
-        return any(flags)
+            flag = check(e["body"], {**scope, e["index"]: e["set"]}, depth + 1)
+        else:
+            children = (
+                e["args"]
+                if kind in ("add", "max", "min")
+                else [e["arg"]]
+                if kind in ("neg", "abs")
+                else [e["left"], e["right"]]
+                if kind == "mul"
+                else [e["numerator"], e["denominator"]]
+            )
+            flags = [check(c, scope, depth + 1) for c in children]
+            if kind == "div" and flags[1]:
+                fail("UNSUPPORTED_NONLINEAR", "不支持决策变量作分母")
+            flag = any(flags)
+        has_var[id(e)] = flag
+        return flag
 
     def add(a, b):
         c = number(a[0] + b[0])
@@ -307,7 +315,114 @@ def compile_model(raw, data=None, revision_id="cli", limits=None):
             v: number(c * k) for v, c in a[1].items() if c * k != 0
         }
 
-    def expr(e, env):
+    def terms(t):
+        return [dict(var_id=k, coef=v) for k, v in sorted(t.items())]
+
+    def emit(form, sense):
+        nonlocal nnz
+        if len(rows) >= limits.rows:
+            fail("MODEL_LIMIT", "展开约束超过上限")
+        k, t = form
+        nnz += len(t)
+        if nnz > limits.nonzeros:
+            fail("MODEL_LIMIT", "非零系数超过上限")
+        rows.append(
+            dict(
+                id=f"r_{len(rows):06d}",
+                source_id=source,
+                indices=list(cur_indices),
+                lower=-k if sense in ("ge", "eq") else None,
+                upper=-k if sense in ("le", "eq") else None,
+                terms=terms(t),
+            )
+        )
+
+    def new_aux(kind, domain, lo, hi):
+        nonlocal aux_count
+        if len(variables) >= limits.variables:
+            fail("MODEL_LIMIT", "展开变量超过上限")
+        aux_count += 1
+        vid = f"v_{len(variables):06d}"
+        variables.append(
+            dict(
+                id=vid,
+                domain=domain,
+                lower=lo if lo is not None and math.isfinite(lo) else None,
+                upper=hi if hi is not None and math.isfinite(hi) else None,
+                source_id=source,
+                indices=list(cur_indices),
+                label=f"辅助变量 {kind}#{aux_count}",
+                auxiliary=True,
+            )
+        )
+        return vid
+
+    def bounds_of(form):
+        lo = hi = form[0]
+        for vid, c in form[1].items():
+            v = variables[int(vid[2:])]
+            lb = -math.inf if v["lower"] is None else v["lower"]
+            ub = math.inf if v["upper"] is None else v["upper"]
+            lo += c * (lb if c > 0 else ub)
+            hi += c * (ub if c > 0 else lb)
+        return lo, hi
+
+    def maxof(forms, relaxed):
+        """线性化 max；relaxed 时仅保留 t >= 各项，适用于目标/约束推动 t 变小的情形。"""
+        bs = [bounds_of(f) for f in forms]
+        keep = list(range(len(forms)))
+        for i in list(keep):
+            if len(keep) > 1 and bs[i][1] <= max(bs[j][0] for j in keep if j != i):
+                keep.remove(i)
+        if len(keep) == 1:
+            return forms[keep[0]]
+        forms = [forms[i] for i in keep]
+        bs = [bs[i] for i in keep]
+        hi = max(b[1] for b in bs)
+        t = new_aux("max", "continuous", max(b[0] for b in bs), hi)
+        tf = (0, {t: 1})
+        for f in forms:
+            emit(add(tf, scale(f, -1)), "ge")
+        if relaxed:
+            return tf
+        if not math.isfinite(hi) or any(not math.isfinite(b[0]) for b in bs):
+            fail(
+                "UNBOUNDED_LINEARIZATION",
+                "此处 abs/max/min 无法确定地线性化：相关变量需要有限的上下界",
+            )
+        zs = [new_aux("choice", "binary", 0, 1) for _ in forms]
+        emit((-1, {z: 1 for z in zs}), "eq")
+        for f, b, z in zip(forms, bs, zs):
+            big = hi - b[0]
+            emit(add(add(tf, scale(f, -1)), (-big, {z: big})), "le")
+        return tf
+
+    def sign_of(x):
+        return (x > 0) - (x < 0)
+
+    def product(a, b):
+        """二进制变量与有界线性式相乘，使用精确的大 M 线性化。"""
+        for z_form, w in ((a, b), (b, a)):
+            if len(z_form[1]) != 1:
+                continue
+            (z, c1), = z_form[1].items()
+            zv = variables[int(z[2:])]
+            if zv["domain"] != "binary":
+                continue
+            lo, hi = bounds_of(w)
+            if not (math.isfinite(lo) and math.isfinite(hi)):
+                fail("UNBOUNDED_LINEARIZATION", "二进制变量相乘的另一因子需要有限的上下界")
+            y = new_aux("product", "continuous", min(0, lo), max(0, hi))
+            yf, zf = (0, {y: 1}), (0, {z: 1})
+            emit(add(yf, scale(zf, -hi)), "le")
+            emit(add(yf, scale(zf, -lo)), "ge")
+            emit(add(add(yf, scale(w, -1)), (lo, {z: -lo})), "le")
+            emit(add(add(yf, scale(w, -1)), (hi, {z: -hi})), "ge")
+            return add(scale(w, z_form[0]), scale(yf, c1))
+        fail("UNSUPPORTED_NONLINEAR", "不支持决策变量相乘（仅支持二进制变量与有界线性表达式相乘）")
+
+    def expr(e, env, pol=0):
+        """pol: 目标/约束中该式变大是否更“差”（+1/-1，0 表示未知，需精确线性化）。"""
         nonlocal operations
         operations += 1
         if operations > limits.operations:
@@ -327,39 +442,58 @@ def compile_model(raw, data=None, revision_id="cli", limits=None):
                 fail("MISSING_PARAMETER", "缺少参数值")
             return number(val), {}
         if kind == "neg":
-            return scale(expr(e["arg"], env), -1)
+            return scale(expr(e["arg"], env, -pol), -1)
         if kind == "add":
             out = (0, {})
             for arg in e["args"]:
-                out = add(out, expr(arg, env))
+                out = add(out, expr(arg, env, pol))
             return out
         if kind == "sum":
             out = (0, {})
             for i in resolve_set(e["set"], e.get("set_index"), env):
-                out = add(out, expr(e["body"], {**env, e["index"]: i}))
+                out = add(out, expr(e["body"], {**env, e["index"]: i}, pol))
             return out
+        if kind == "abs":
+            a = expr(e["arg"], env)
+            return maxof([a, scale(a, -1)], pol == 1)
+        if kind in ("max", "min"):
+            smax = pol if kind == "max" else -pol
+            args = [expr(x, env, pol if smax == 1 else 0) for x in e["args"]]
+            if not any(a[1] for a in args):
+                values = [a[0] for a in args]
+                return (max(values) if kind == "max" else min(values)), {}
+            if kind == "max":
+                return maxof(args, smax == 1)
+            return scale(maxof([scale(a, -1) for a in args], smax == 1), -1)
         if kind == "mul":
-            a, b = expr(e["left"], env), expr(e["right"], env)
-            return scale(a, b[0]) if not b[1] else scale(b, a[0])
-        a, b = expr(e["numerator"], env), expr(e["denominator"], env)
+            left, right = e["left"], e["right"]
+            if not has_var[id(right)] or not has_var[id(left)]:
+                const_side, var_side = (
+                    (right, left) if not has_var[id(right)] else (left, right)
+                )
+                k = expr(const_side, env)[0]
+                if k == 0:
+                    return 0, {}
+                return scale(expr(var_side, env, pol * sign_of(k)), k)
+            a, b = expr(left, env), expr(right, env)
+            return product(a, b)
+        b = expr(e["denominator"], env)
         if b[0] == 0:
             fail("DIVISION_BY_ZERO", "参数分母为零")
-        return scale(a, 1 / b[0])
-
-    def terms(t):
-        return [dict(var_id=k, coef=v) for k, v in sorted(t.items())]
+        return scale(expr(e["numerator"], env, pol * sign_of(b[0])), 1 / b[0])
 
     source = doc["objective"]["id"]
     check(doc["objective"]["expr"], {})
-    constant, coef = expr(doc["objective"]["expr"], {})
+    constant, coef = expr(
+        doc["objective"]["expr"], {}, 1 if doc["objective"]["sense"] == "min" else -1
+    )
     objective = dict(
         source_id=source,
         sense=doc["objective"]["sense"],
         constant=constant,
         terms=terms(coef),
     )
-    rows = []
-    nnz = len(coef)
+    nnz += len(coef)
     if nnz > limits.nonzeros:
         fail("MODEL_LIMIT", "目标非零系数超过上限")
     def compile_where(where_text, scope):
@@ -539,22 +673,14 @@ def compile_model(raw, data=None, revision_id="cli", limits=None):
         for env in expand_quantifiers(c["for_each"]):
             if not where_fn(env):
                 continue
-            indices = [env[q["index"]] for q in c["for_each"]]
-            if len(rows) >= limits.rows:
-                fail("MODEL_LIMIT", "展开约束超过上限")
-            k, t = add(expr(c["lhs"], env), scale(expr(c["rhs"], env), -1))
-            nnz += len(t)
-            if nnz > limits.nonzeros:
-                fail("MODEL_LIMIT", "非零系数超过上限")
-            rows.append(
-                dict(
-                    id=f"r_{len(rows):06d}",
-                    source_id=source,
-                    indices=list(indices),
-                    lower=-k if c["sense"] in ("ge", "eq") else None,
-                    upper=-k if c["sense"] in ("le", "eq") else None,
-                    terms=terms(t),
-                )
+            cur_indices = [env[q["index"]] for q in c["for_each"]]
+            lhs_pol = {"le": 1, "ge": -1, "eq": 0}[c["sense"]]
+            emit(
+                add(
+                    expr(c["lhs"], env, lhs_pol),
+                    scale(expr(c["rhs"], env, -lhs_pol), -1),
+                ),
+                c["sense"],
             )
     return dict(
         schema_version="1.0",

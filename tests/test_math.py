@@ -185,7 +185,7 @@ def test_limits():
     [
         "__import__('os').system('id')",
         "x**2",
-        "max(x,y)",
+        "max(x)",
         "x.real",
         "[x for x in range(3)]",
     ],
