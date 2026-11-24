@@ -7,9 +7,8 @@ __pycache__/
 build/
 *.egg-info/
 
-# Node / frontend build output
+# Node
 node_modules/
-frontend/dist/
 
 # Runtime data and secrets
 .runtime/
