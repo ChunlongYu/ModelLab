@@ -8,7 +8,9 @@ import time
 from pathlib import Path
 import httpx
 import pytest
-from playwright.sync_api import sync_playwright, expect
+
+pytest.importorskip("playwright")
+from playwright.sync_api import sync_playwright, expect  # noqa: E402
 from modellab.storage import initialize, transaction
 
 
