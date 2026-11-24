@@ -1,0 +1,1142 @@
+{
+  "$defs": {
+    "Add": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "add",
+          "title": "Kind",
+          "type": "string"
+        },
+        "args": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "add": "#/$defs/Add",
+                "div": "#/$defs/Div",
+                "mul": "#/$defs/Mul",
+                "neg": "#/$defs/Neg",
+                "number": "#/$defs/Number",
+                "param": "#/$defs/Param",
+                "sum": "#/$defs/Sum",
+                "var": "#/$defs/Var"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Number"
+              },
+              {
+                "$ref": "#/$defs/Param"
+              },
+              {
+                "$ref": "#/$defs/Var"
+              },
+              {
+                "$ref": "#/$defs/Add"
+              },
+              {
+                "$ref": "#/$defs/Neg"
+              },
+              {
+                "$ref": "#/$defs/Mul"
+              },
+              {
+                "$ref": "#/$defs/Div"
+              },
+              {
+                "$ref": "#/$defs/Sum"
+              }
+            ]
+          },
+          "title": "Args",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "args"
+      ],
+      "title": "Add",
+      "type": "object"
+    },
+    "Constraint": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "for_each": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Quantifier"
+          },
+          "title": "For Each",
+          "type": "array"
+        },
+        "lhs": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Lhs"
+        },
+        "sense": {
+          "enum": [
+            "le",
+            "eq",
+            "ge"
+          ],
+          "title": "Sense",
+          "type": "string"
+        },
+        "rhs": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Rhs"
+        },
+        "source_refs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "transcript_latex": {
+          "default": "",
+          "title": "Transcript Latex",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "lhs",
+        "sense",
+        "rhs"
+      ],
+      "title": "Constraint",
+      "type": "object"
+    },
+    "Div": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "div",
+          "title": "Kind",
+          "type": "string"
+        },
+        "numerator": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Numerator"
+        },
+        "denominator": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Denominator"
+        }
+      },
+      "required": [
+        "kind",
+        "numerator",
+        "denominator"
+      ],
+      "title": "Div",
+      "type": "object"
+    },
+    "Entry": {
+      "additionalProperties": false,
+      "properties": {
+        "indices": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Indices",
+          "type": "array"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "indices",
+        "value"
+      ],
+      "title": "Entry",
+      "type": "object"
+    },
+    "Index": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "index",
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "title": "Index",
+      "type": "object"
+    },
+    "LiteralIndex": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "literal",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "LiteralIndex",
+      "type": "object"
+    },
+    "Mul": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "mul",
+          "title": "Kind",
+          "type": "string"
+        },
+        "left": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Left"
+        },
+        "right": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Right"
+        }
+      },
+      "required": [
+        "kind",
+        "left",
+        "right"
+      ],
+      "title": "Mul",
+      "type": "object"
+    },
+    "Neg": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "neg",
+          "title": "Kind",
+          "type": "string"
+        },
+        "arg": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Arg"
+        }
+      },
+      "required": [
+        "kind",
+        "arg"
+      ],
+      "title": "Neg",
+      "type": "object"
+    },
+    "Number": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "number",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "Number",
+      "type": "object"
+    },
+    "Objective": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "default": "obj",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "sense": {
+          "enum": [
+            "min",
+            "max"
+          ],
+          "title": "Sense",
+          "type": "string"
+        },
+        "expr": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Expr"
+        },
+        "source_refs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "transcript_latex": {
+          "default": "",
+          "title": "Transcript Latex",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sense",
+        "expr"
+      ],
+      "title": "Objective",
+      "type": "object"
+    },
+    "Param": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "param",
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "indices": {
+          "default": [],
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "index": "#/$defs/Index",
+                "literal": "#/$defs/LiteralIndex"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Index"
+              },
+              {
+                "$ref": "#/$defs/LiteralIndex"
+              }
+            ]
+          },
+          "title": "Indices",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "Param",
+      "type": "object"
+    },
+    "Parameter": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "symbol": {
+          "default": "",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "sets": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+            "type": "string"
+          },
+          "title": "Sets",
+          "type": "array"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "entries": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Entry"
+          },
+          "title": "Entries",
+          "type": "array"
+        },
+        "data_key": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Key"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "source_refs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "Parameter",
+      "type": "object"
+    },
+    "Quantifier": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Index",
+          "type": "string"
+        },
+        "set": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Set",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "set"
+      ],
+      "title": "Quantifier",
+      "type": "object"
+    },
+    "SetDecl": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Members",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "members"
+      ],
+      "title": "SetDecl",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "image_id": {
+          "title": "Image Id",
+          "type": "string"
+        },
+        "order": {
+          "default": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "bbox": {
+          "anyOf": [
+            {
+              "maxItems": 4,
+              "minItems": 4,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bbox"
+        }
+      },
+      "required": [
+        "image_id"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Sum": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "sum",
+          "title": "Kind",
+          "type": "string"
+        },
+        "index": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Index",
+          "type": "string"
+        },
+        "set": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Set",
+          "type": "string"
+        },
+        "body": {
+          "discriminator": {
+            "mapping": {
+              "add": "#/$defs/Add",
+              "div": "#/$defs/Div",
+              "mul": "#/$defs/Mul",
+              "neg": "#/$defs/Neg",
+              "number": "#/$defs/Number",
+              "param": "#/$defs/Param",
+              "sum": "#/$defs/Sum",
+              "var": "#/$defs/Var"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Number"
+            },
+            {
+              "$ref": "#/$defs/Param"
+            },
+            {
+              "$ref": "#/$defs/Var"
+            },
+            {
+              "$ref": "#/$defs/Add"
+            },
+            {
+              "$ref": "#/$defs/Neg"
+            },
+            {
+              "$ref": "#/$defs/Mul"
+            },
+            {
+              "$ref": "#/$defs/Div"
+            },
+            {
+              "$ref": "#/$defs/Sum"
+            }
+          ],
+          "title": "Body"
+        }
+      },
+      "required": [
+        "kind",
+        "index",
+        "set",
+        "body"
+      ],
+      "title": "Sum",
+      "type": "object"
+    },
+    "Unresolved": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "source_id": {
+          "default": "",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "resolved": {
+          "default": false,
+          "title": "Resolved",
+          "type": "boolean"
+        },
+        "resolution": {
+          "default": "",
+          "title": "Resolution",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "question"
+      ],
+      "title": "Unresolved",
+      "type": "object"
+    },
+    "Var": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "var",
+          "title": "Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "indices": {
+          "default": [],
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "index": "#/$defs/Index",
+                "literal": "#/$defs/LiteralIndex"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Index"
+              },
+              {
+                "$ref": "#/$defs/LiteralIndex"
+              }
+            ]
+          },
+          "title": "Indices",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "Var",
+      "type": "object"
+    },
+    "Variable": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "symbol": {
+          "default": "",
+          "title": "Symbol",
+          "type": "string"
+        },
+        "sets": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$",
+            "type": "string"
+          },
+          "title": "Sets",
+          "type": "array"
+        },
+        "domain": {
+          "enum": [
+            "continuous",
+            "integer",
+            "binary"
+          ],
+          "title": "Domain",
+          "type": "string"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower"
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper"
+        },
+        "range_source": {
+          "default": "manual",
+          "title": "Range Source",
+          "type": "string"
+        },
+        "source_refs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "domain",
+        "lower",
+        "upper"
+      ],
+      "title": "Variable",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sets": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SetDecl"
+      },
+      "title": "Sets",
+      "type": "array"
+    },
+    "parameters": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Parameter"
+      },
+      "title": "Parameters",
+      "type": "array"
+    },
+    "variables": {
+      "items": {
+        "$ref": "#/$defs/Variable"
+      },
+      "title": "Variables",
+      "type": "array"
+    },
+    "objective": {
+      "$ref": "#/$defs/Objective"
+    },
+    "constraints": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Constraint"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "unresolved_items": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Unresolved"
+      },
+      "title": "Unresolved Items",
+      "type": "array"
+    },
+    "transcript": {
+      "default": "",
+      "title": "Transcript",
+      "type": "string"
+    }
+  },
+  "required": [
+    "variables",
+    "objective"
+  ],
+  "title": "ModelDoc",
+  "type": "object"
+}
